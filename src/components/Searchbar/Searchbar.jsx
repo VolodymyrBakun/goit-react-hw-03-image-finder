@@ -1,41 +1,45 @@
-import { Component } from "react";
+import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 export class Searchbar extends Component {
   state = {
-    toSearch: "",
-  }
+    toSearch: '',
+  };
 
   handleChange = event => {
     this.setState({
-      toSearch: event.target.value
-    })
-  }
+      toSearch: event.target.value,
+    });
+  };
 
-  handleFormSubmit = (event) => {
+  handleFormSubmit = event => {
     event.preventDefault();
-    this.props.onSubmit(this.state.toSearch)
+    this.props.onSubmit(this.state.toSearch);
+  };
 
+  render() {
+    return (
+      <header className="Searchbar">
+        <form className="SearchForm" onSubmit={this.handleFormSubmit}>
+          <button type="submit" className="SearchForm-button">
+            <span className="SearchForm-button-label">Search</span>
+          </button>
+
+          <input
+            className="SearchForm-input"
+            type="text"
+            autoComplete="off"
+            autoFocus
+            placeholder="Search images and photos"
+            value={this.state.toSearch}
+            onChange={this.handleChange}
+          />
+        </form>
+      </header>
+    );
   }
-
-    render() {
-        return (
-          <header className="Searchbar">
-            <form className="SearchForm" onSubmit={this.handleFormSubmit}>
-              <button type="submit" className="SearchForm-button">
-                <span className="SearchForm-button-label">Search</span>
-              </button>
-
-              <input
-                className="SearchForm-input"
-                type="text"
-                autoComplete="off"
-                autoFocus
-                placeholder="Search images and photos"
-                value={this.state.toSearch}
-                onChange={this.handleChange}
-              />
-            </form>
-          </header>
-        );
-    }
 }
+
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};

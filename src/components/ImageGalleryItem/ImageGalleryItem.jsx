@@ -1,11 +1,13 @@
-
-
-export function ImageGalleryItem({imgData}) {
+export function ImageGalleryItem({ imgData, selectImg }) {
   return (
     <>
       {imgData.map(item => {
         return (
-          <li className="ImageGalleryItem" key={item.id}>
+          <li
+            className="ImageGalleryItem"
+            onClick={() => selectImg(item.id)}
+            key={item.id}
+          >
             <img
               className="ImageGalleryItem-image"
               src={item.webformatURL}
