@@ -14,34 +14,45 @@ export class App extends Component {
     images: [],
     isLoading: false,
     error: null,
-    page: 1,
+    page: null,
     totalHits: 0,
     selectedImgId: null,
     selectedImg: null,
   };
 
   handleSubmit = toSearch => {
-    this.setState({ toSearch, page: 1, totalHits: 0, error: null });
+    this.setState({ toSearch, page: 1, totalHits: 0, error: null, images: [] });
   };
 
-  handleLoadMoreBtn = async () => {
+  handleLoadMoreBtn = () => {
+    this.setState(prevState => {
+      return { page: prevState.page + 1 };
+    });
+  };
+
+  handleFech = async () => {
     try {
       this.setState({ isLoading: true });
-
-      const response = await fechImg(this.state.toSearch, this.state.page + 1);
-      this.setState({
-        images: [...this.state.images, ...response.data.hits],
-        page: this.state.page + 1,
-      });
+      const response = await fechImg(this.state.toSearch, this.state.page);
+       this.setState(prevState => {
+        return {
+          images: [...prevState.images, ...response.data.hits],
+          totalHits: response.data.totalHits,
+        };
+       });
+       if (response.data.totalHits === 0) {
+         Notiflix.Notify.warning('Nothing found, please try something else!');
+         return
+       };
+      if (response.data.hits.length < 12) {
+        Notiflix.Notify.info('Thats all we have');
+      };
     } catch (error) {
       this.setState({ error: error.message });
     } finally {
       this.setState({ isLoading: false });
     }
-
-    if (this.state.totalHits - 12 <= this.state.images.length) {
-      Notiflix.Notify.info('Thats all we have');
-    }
+    
   };
 
   onSelectImg = selectedImgId => {
@@ -57,26 +68,11 @@ export class App extends Component {
   };
 
   async componentDidUpdate(_, prevState) {
-    if (this.state.toSearch !== prevState.toSearch) {
-      try {
-        this.setState({ isLoading: true });
-        const response = await fechImg(this.state.toSearch);
-        if (response.data.totalHits === 0) {
-          Notiflix.Notify.warning('Nothing found, please try something else!');
-        }
-        this.setState({
-          images: response.data.hits,
-          totalHits: response.data.totalHits,
-        });
-      } catch (error) {
-        this.setState({ error: error.message });
-      } finally {
-        this.setState({ isLoading: false });
-      }
+    if (this.state.toSearch !== prevState.toSearch || 
+      this.state.page !== prevState.page) {
+      this.handleFech();
     }
 
-    if (prevState.selectedImgId !== this.state.selectedImgId) {
-    }
   }
 
   render() {
